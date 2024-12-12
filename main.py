@@ -7,15 +7,27 @@ import numpy as np
 
 # base = 200mm X 200mm
 SIDE_LENGTH = 200
+
+# distance to lift pen
 DISTANCE_TO_LIFT_PEN = 10
 
+# constants for image processing
+CONTRAST = 1.0
+BRIGHTNESS = 0
 
-def image_to_outlines(filename: str):
+
+def resize_image(input_path, output_path, max_size=(300, 300)):
+    with Image.open(input_path) as img:
+        img.thumbnail(max_size)
+        img.save(output_path)
+
+
+def image_to_outlines(src: str):
     # Ladataan kuva
-    image = cv2.imread(f"./images/{filename}", cv2.IMREAD_GRAYSCALE)
+    image = cv2.imread(src, cv2.IMREAD_GRAYSCALE)
 
-    alpha = 1.2  # Kontrasti (1.0 = ei muutosta)
-    beta = 40  # Kirkkaus (+50 kirkastaa)
+    alpha = CONTRAST  # Kontrasti (1.0 = ei muutosta)
+    beta = BRIGHTNESS  # Kirkkaus (+50 kirkastaa)
 
     bright_image = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
 
@@ -112,6 +124,9 @@ def finish_gcode(dest: str, scaling_factor: float | None = None):
                 updated_lines.append(line.to_string())
 
         result += updated_lines
+
+        result.append("M3 S2000\n")
+        result.append("G0 X0 Y0\n")
         res.writelines(result)
 
 
@@ -137,7 +152,8 @@ def main():
         return
     filename = argv[1]
     filename_omit_extension = filename.split(".")[0]
-    image_to_outlines(filename)
+    resize_image(f"./images/{filename}", "./processing/compressed.jpg")
+    image_to_outlines("./processing/compressed.jpg")
     outlines_to_gcode()
     finish_gcode(f"./output/{filename_omit_extension}.nc")
 
