@@ -1,3 +1,8 @@
+Used in the plotter-robot (https://github.com/Vegss/Plotter-Project) to turn images into g-code which the robot can use.
+
+
+
+
 # Image to G-code converter
 
 This repository contains a Python 3 script that takes an **image as input** and generates a **2D G-code file as output**. The script can either use the provided image as an edges image, or auto-detect the edges using the Sobel operator. Then a graph is built and it is converted to G-code. You can then **use the produced G-code in a 2D plotter**, you may find this other project of mine useful: [plotter](https://github.com/Stypox/plotter).
